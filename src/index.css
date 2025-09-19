@@ -2,41 +2,71 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
-All colors MUST be HSL.
-*/
+/* Civic Coin Platform Design System - Professional Civic Tech Design */
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
+    /* Base colors for clean, trustworthy government design */
+    --background: 250 100% 99%;
+    --foreground: 222 47% 11%;
 
     --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    --card-foreground: 222 47% 11%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
+    --popover-foreground: 222 47% 11%;
 
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
+    /* Primary: Government blue for trust and authority */
+    --primary: 217 91% 45%;
+    --primary-foreground: 0 0% 100%;
+    --primary-hover: 217 91% 40%;
 
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
+    /* Secondary: Civic green for growth and community */
+    --secondary: 142 52% 96%;
+    --secondary-foreground: 142 52% 20%;
 
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
+    /* Muted colors for subtle elements */
+    --muted: 220 13% 96%;
+    --muted-foreground: 220 9% 45%;
 
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
+    /* Accent: Civic coin gold for gamification */
+    --accent: 45 93% 47%;
+    --accent-foreground: 26 83% 14%;
 
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
+    /* Success: Resolved issue green */
+    --success: 142 52% 45%;
+    --success-foreground: 0 0% 100%;
 
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
+    /* Warning: Pending issue amber */
+    --warning: 38 92% 50%;
+    --warning-foreground: 26 83% 14%;
 
-    --radius: 0.5rem;
+    /* Destructive: Critical issue red */
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+
+    /* Border and input styling */
+    --border: 220 13% 91%;
+    --input: 220 13% 91%;
+    --ring: 217 91% 45%;
+
+    /* Radius for modern feel */
+    --radius: 0.75rem;
+
+    /* Custom gradients for engaging design */
+    --gradient-primary: linear-gradient(135deg, hsl(217 91% 45%), hsl(217 91% 55%));
+    --gradient-success: linear-gradient(135deg, hsl(142 52% 45%), hsl(142 52% 55%));
+    --gradient-civic: linear-gradient(135deg, hsl(217 91% 45%), hsl(142 52% 45%));
+    --gradient-gold: linear-gradient(135deg, hsl(45 93% 47%), hsl(45 93% 57%));
+
+    /* Shadows for depth */
+    --shadow-soft: 0 2px 10px hsl(220 13% 91% / 0.3);
+    --shadow-medium: 0 4px 20px hsl(220 13% 91% / 0.4);
+    --shadow-strong: 0 8px 30px hsl(217 91% 45% / 0.15);
+
+    /* Animation timing */
+    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-bounce: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
 
     --sidebar-background: 0 0% 98%;
 

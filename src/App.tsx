@@ -2,34 +2,82 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { AuthProvider, useAuth } from "@/contexts/AuthContext";
 import LandingPage from "./pages/LandingPage";
+import AuthPage from "./pages/AuthPage";
+import Dashboard from "./pages/Dashboard";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
 
+// Protected Route Component
+const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
+  const { user, loading } = useAuth();
+  
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
+  
+  if (!user) {
+    return <Navigate to="/auth" replace />;
+  }
+  
+  return <>{children}</>;
+};
+
+const AppRoutes = () => (
+  <BrowserRouter>
+    <Routes>
+      <Route path="/" element={<LandingPage />} />
+      <Route path="/auth" element={<AuthPage />} />
+      <Route path="/login" element={<Navigate to="/auth" replace />} />
+      <Route path="/register" element={<Navigate to="/auth" replace />} />
+      
+      {/* Protected Routes */}
+      <Route path="/dashboard" element={
+        <ProtectedRoute>
+          <Dashboard />
+        </ProtectedRoute>
+      } />
+      <Route path="/report" element={
+        <ProtectedRoute>
+          <div className="flex min-h-screen items-center justify-center">
+            <div className="text-center">
+              <h1 className="text-2xl font-bold mb-4">Report Issue</h1>
+              <p className="text-muted-foreground">Issue reporting coming soon</p>
+            </div>
+          </div>
+        </ProtectedRoute>
+      } />
+      <Route path="/map" element={
+        <div className="flex min-h-screen items-center justify-center">
+          <div className="text-center">
+            <h1 className="text-2xl font-bold mb-4">City Map</h1>
+            <p className="text-muted-foreground">Interactive map coming soon</p>
+          </div>
+        </div>
+      } />
+      
+      {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+      <Route path="*" element={<NotFound />} />
+    </Routes>
+  </BrowserRouter>
+);
+
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<LandingPage />} />
-          {/* Authentication routes - will need Supabase integration */}
-          <Route path="/login" element={<div className="flex min-h-screen items-center justify-center"><div className="text-center"><h1 className="text-2xl font-bold mb-4">Login</h1><p className="text-muted-foreground">Authentication coming soon with Supabase integration</p></div></div>} />
-          <Route path="/register" element={<div className="flex min-h-screen items-center justify-center"><div className="text-center"><h1 className="text-2xl font-bold mb-4">Register</h1><p className="text-muted-foreground">Registration coming soon with Supabase integration</p></div></div>} />
-          
-          {/* Dashboard routes - will need Supabase integration */}
-          <Route path="/dashboard" element={<div className="flex min-h-screen items-center justify-center"><div className="text-center"><h1 className="text-2xl font-bold mb-4">Dashboard</h1><p className="text-muted-foreground">Dashboard coming soon with Supabase integration</p></div></div>} />
-          <Route path="/report" element={<div className="flex min-h-screen items-center justify-center"><div className="text-center"><h1 className="text-2xl font-bold mb-4">Report Issue</h1><p className="text-muted-foreground">Issue reporting coming soon with Supabase integration</p></div></div>} />
-          <Route path="/map" element={<div className="flex min-h-screen items-center justify-center"><div className="text-center"><h1 className="text-2xl font-bold mb-4">City Map</h1><p className="text-muted-foreground">Interactive map coming soon</p></div></div>} />
-          
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </BrowserRouter>
-    </TooltipProvider>
+    <AuthProvider>
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
+        <AppRoutes />
+      </TooltipProvider>
+    </AuthProvider>
   </QueryClientProvider>
 );
 

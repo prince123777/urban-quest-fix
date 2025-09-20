@@ -14,13 +14,269 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      civic_coin_transactions: {
+        Row: {
+          amount: number
+          created_at: string
+          description: string
+          id: string
+          issue_id: string | null
+          transaction_type: string
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          description: string
+          id?: string
+          issue_id?: string | null
+          transaction_type: string
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          description?: string
+          id?: string
+          issue_id?: string | null
+          transaction_type?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "civic_coin_transactions_issue_id_fkey"
+            columns: ["issue_id"]
+            isOneToOne: false
+            referencedRelation: "issues"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "civic_coin_transactions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      issue_categories: {
+        Row: {
+          civic_coins_reward: number
+          color: string | null
+          created_at: string
+          description: string | null
+          icon: string | null
+          id: string
+          name: string
+        }
+        Insert: {
+          civic_coins_reward?: number
+          color?: string | null
+          created_at?: string
+          description?: string | null
+          icon?: string | null
+          id?: string
+          name: string
+        }
+        Update: {
+          civic_coins_reward?: number
+          color?: string | null
+          created_at?: string
+          description?: string | null
+          icon?: string | null
+          id?: string
+          name?: string
+        }
+        Relationships: []
+      }
+      issues: {
+        Row: {
+          address: string | null
+          assigned_department: string | null
+          assigned_to: string | null
+          category: string
+          civic_coins_awarded: number | null
+          created_at: string
+          description: string | null
+          id: string
+          location_lat: number | null
+          location_lng: number | null
+          photo_urls: string[] | null
+          priority: string
+          reporter_id: string
+          resolved_at: string | null
+          status: string
+          title: string
+          updated_at: string
+          upvotes: number
+        }
+        Insert: {
+          address?: string | null
+          assigned_department?: string | null
+          assigned_to?: string | null
+          category: string
+          civic_coins_awarded?: number | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          location_lat?: number | null
+          location_lng?: number | null
+          photo_urls?: string[] | null
+          priority?: string
+          reporter_id: string
+          resolved_at?: string | null
+          status?: string
+          title: string
+          updated_at?: string
+          upvotes?: number
+        }
+        Update: {
+          address?: string | null
+          assigned_department?: string | null
+          assigned_to?: string | null
+          category?: string
+          civic_coins_awarded?: number | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          location_lat?: number | null
+          location_lng?: number | null
+          photo_urls?: string[] | null
+          priority?: string
+          reporter_id?: string
+          resolved_at?: string | null
+          status?: string
+          title?: string
+          updated_at?: string
+          upvotes?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "issues_assigned_to_fkey"
+            columns: ["assigned_to"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "issues_reporter_id_fkey"
+            columns: ["reporter_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      notifications: {
+        Row: {
+          created_at: string
+          id: string
+          issue_id: string | null
+          message: string
+          read: boolean
+          title: string
+          type: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          issue_id?: string | null
+          message: string
+          read?: boolean
+          title: string
+          type: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          issue_id?: string | null
+          message?: string
+          read?: boolean
+          title?: string
+          type?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "notifications_issue_id_fkey"
+            columns: ["issue_id"]
+            isOneToOne: false
+            referencedRelation: "issues"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "notifications_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          civic_coins: number
+          created_at: string
+          department: string | null
+          email: string
+          full_name: string
+          government_id: string | null
+          id: string
+          rank: string | null
+          resolved_reports: number
+          total_reports: number
+          updated_at: string
+          user_id: string
+          user_type: string
+        }
+        Insert: {
+          civic_coins?: number
+          created_at?: string
+          department?: string | null
+          email: string
+          full_name: string
+          government_id?: string | null
+          id?: string
+          rank?: string | null
+          resolved_reports?: number
+          total_reports?: number
+          updated_at?: string
+          user_id: string
+          user_type: string
+        }
+        Update: {
+          civic_coins?: number
+          created_at?: string
+          department?: string | null
+          email?: string
+          full_name?: string
+          government_id?: string | null
+          id?: string
+          rank?: string | null
+          resolved_reports?: number
+          total_reports?: number
+          updated_at?: string
+          user_id?: string
+          user_type?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      award_civic_coins: {
+        Args: {
+          coin_amount: number
+          description_text: string
+          related_issue_id?: string
+          user_profile_id: string
+        }
+        Returns: undefined
+      }
     }
     Enums: {
       [_ in never]: never

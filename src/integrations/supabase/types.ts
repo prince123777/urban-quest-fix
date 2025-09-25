@@ -54,6 +54,13 @@ export type Database = {
             foreignKeyName: "civic_coin_transactions_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
+            referencedRelation: "leaderboard"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "civic_coin_transactions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
@@ -98,17 +105,21 @@ export type Database = {
           civic_coins_awarded: number | null
           created_at: string
           description: string | null
+          government_notes: string | null
           id: string
+          is_anonymous: boolean | null
           location_lat: number | null
           location_lng: number | null
           photo_urls: string[] | null
           priority: string
+          proof_of_fix_urls: string[] | null
           reporter_id: string
           resolved_at: string | null
           status: string
           title: string
           updated_at: string
           upvotes: number
+          voice_description_url: string | null
         }
         Insert: {
           address?: string | null
@@ -118,17 +129,21 @@ export type Database = {
           civic_coins_awarded?: number | null
           created_at?: string
           description?: string | null
+          government_notes?: string | null
           id?: string
+          is_anonymous?: boolean | null
           location_lat?: number | null
           location_lng?: number | null
           photo_urls?: string[] | null
           priority?: string
+          proof_of_fix_urls?: string[] | null
           reporter_id: string
           resolved_at?: string | null
           status?: string
           title: string
           updated_at?: string
           upvotes?: number
+          voice_description_url?: string | null
         }
         Update: {
           address?: string | null
@@ -138,19 +153,30 @@ export type Database = {
           civic_coins_awarded?: number | null
           created_at?: string
           description?: string | null
+          government_notes?: string | null
           id?: string
+          is_anonymous?: boolean | null
           location_lat?: number | null
           location_lng?: number | null
           photo_urls?: string[] | null
           priority?: string
+          proof_of_fix_urls?: string[] | null
           reporter_id?: string
           resolved_at?: string | null
           status?: string
           title?: string
           updated_at?: string
           upvotes?: number
+          voice_description_url?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "issues_assigned_to_fkey"
+            columns: ["assigned_to"]
+            isOneToOne: false
+            referencedRelation: "leaderboard"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "issues_assigned_to_fkey"
             columns: ["assigned_to"]
@@ -162,7 +188,55 @@ export type Database = {
             foreignKeyName: "issues_reporter_id_fkey"
             columns: ["reporter_id"]
             isOneToOne: false
+            referencedRelation: "leaderboard"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "issues_reporter_id_fkey"
+            columns: ["reporter_id"]
+            isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      media_uploads: {
+        Row: {
+          created_at: string | null
+          file_size: number | null
+          file_type: string
+          file_url: string
+          id: string
+          issue_id: string | null
+          upload_type: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          file_size?: number | null
+          file_type: string
+          file_url: string
+          id?: string
+          issue_id?: string | null
+          upload_type: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          file_size?: number | null
+          file_type?: string
+          file_url?: string
+          id?: string
+          issue_id?: string | null
+          upload_type?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "media_uploads_issue_id_fkey"
+            columns: ["issue_id"]
+            isOneToOne: false
+            referencedRelation: "issues"
             referencedColumns: ["id"]
           },
         ]
@@ -210,20 +284,65 @@ export type Database = {
             foreignKeyName: "notifications_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
+            referencedRelation: "leaderboard"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "notifications_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
         ]
       }
+      otp_verifications: {
+        Row: {
+          created_at: string | null
+          expires_at: string
+          id: string
+          is_verified: boolean | null
+          otp_code: string
+          phone_number: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          expires_at: string
+          id?: string
+          is_verified?: boolean | null
+          otp_code: string
+          phone_number: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          expires_at?: string
+          id?: string
+          is_verified?: boolean | null
+          otp_code?: string
+          phone_number?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
+          address: string | null
           civic_coins: number
           created_at: string
           department: string | null
           email: string
           full_name: string
           government_id: string | null
+          government_id_url: string | null
           id: string
+          is_government_verified: boolean | null
+          is_phone_verified: boolean | null
+          location_lat: number | null
+          location_lng: number | null
+          phone_number: string | null
+          profile_photo_url: string | null
           rank: string | null
           resolved_reports: number
           total_reports: number
@@ -232,13 +351,21 @@ export type Database = {
           user_type: string
         }
         Insert: {
+          address?: string | null
           civic_coins?: number
           created_at?: string
           department?: string | null
           email: string
           full_name: string
           government_id?: string | null
+          government_id_url?: string | null
           id?: string
+          is_government_verified?: boolean | null
+          is_phone_verified?: boolean | null
+          location_lat?: number | null
+          location_lng?: number | null
+          phone_number?: string | null
+          profile_photo_url?: string | null
           rank?: string | null
           resolved_reports?: number
           total_reports?: number
@@ -247,13 +374,21 @@ export type Database = {
           user_type: string
         }
         Update: {
+          address?: string | null
           civic_coins?: number
           created_at?: string
           department?: string | null
           email?: string
           full_name?: string
           government_id?: string | null
+          government_id_url?: string | null
           id?: string
+          is_government_verified?: boolean | null
+          is_phone_verified?: boolean | null
+          location_lat?: number | null
+          location_lng?: number | null
+          phone_number?: string | null
+          profile_photo_url?: string | null
           rank?: string | null
           resolved_reports?: number
           total_reports?: number
@@ -265,7 +400,31 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      leaderboard: {
+        Row: {
+          civic_coins: number | null
+          full_name: string | null
+          id: string | null
+          position: number | null
+          profile_photo_url: string | null
+          rank: string | null
+          resolved_reports: number | null
+          total_reports: number | null
+          user_type: string | null
+        }
+        Relationships: []
+      }
+      platform_stats: {
+        Row: {
+          active_citizens: number | null
+          avg_resolution_hours: number | null
+          in_progress_issues: number | null
+          pending_issues: number | null
+          resolved_issues: number | null
+          total_issues: number | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       award_civic_coins: {
@@ -276,6 +435,16 @@ export type Database = {
           user_profile_id: string
         }
         Returns: undefined
+      }
+      send_notification: {
+        Args: {
+          notification_message: string
+          notification_title: string
+          notification_type?: string
+          related_issue_id?: string
+          user_profile_id: string
+        }
+        Returns: string
       }
     }
     Enums: {

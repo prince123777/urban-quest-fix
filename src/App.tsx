@@ -4,9 +4,11 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider, useAuth } from "@/contexts/AuthContext";
-import LandingPage from "./pages/LandingPage";
+import CivicLanding from "./pages/CivicLanding";
 import AuthPage from "./pages/AuthPage";
 import Dashboard from "./pages/Dashboard";
+import CitizenDashboard from "./pages/CitizenDashboard";
+import ReportIssuePage from "./pages/ReportIssuePage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -33,7 +35,7 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
 const AppRoutes = () => (
   <BrowserRouter>
     <Routes>
-      <Route path="/" element={<LandingPage />} />
+      <Route path="/" element={<CivicLanding />} />
       <Route path="/auth" element={<AuthPage />} />
       <Route path="/login" element={<Navigate to="/auth" replace />} />
       <Route path="/register" element={<Navigate to="/auth" replace />} />
@@ -44,14 +46,14 @@ const AppRoutes = () => (
           <Dashboard />
         </ProtectedRoute>
       } />
+      <Route path="/citizen-dashboard" element={
+        <ProtectedRoute>
+          <CitizenDashboard />
+        </ProtectedRoute>
+      } />
       <Route path="/report" element={
         <ProtectedRoute>
-          <div className="flex min-h-screen items-center justify-center">
-            <div className="text-center">
-              <h1 className="text-2xl font-bold mb-4">Report Issue</h1>
-              <p className="text-muted-foreground">Issue reporting coming soon</p>
-            </div>
-          </div>
+          <ReportIssuePage />
         </ProtectedRoute>
       } />
       <Route path="/map" element={

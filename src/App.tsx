@@ -9,6 +9,8 @@ import AuthPage from "./pages/AuthPage";
 import Dashboard from "./pages/Dashboard";
 import CitizenDashboard from "./pages/CitizenDashboard";
 import ReportIssuePage from "./pages/ReportIssuePage";
+import GovernmentDashboard from "./pages/GovernmentDashboard";
+import MapView from "./pages/MapView";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -57,12 +59,14 @@ const AppRoutes = () => (
         </ProtectedRoute>
       } />
       <Route path="/map" element={
-        <div className="flex min-h-screen items-center justify-center">
-          <div className="text-center">
-            <h1 className="text-2xl font-bold mb-4">City Map</h1>
-            <p className="text-muted-foreground">Interactive map coming soon</p>
-          </div>
-        </div>
+        <ProtectedRoute>
+          <MapView />
+        </ProtectedRoute>
+      } />
+      <Route path="/government-dashboard" element={
+        <ProtectedRoute>
+          <GovernmentDashboard />
+        </ProtectedRoute>
       } />
       
       {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

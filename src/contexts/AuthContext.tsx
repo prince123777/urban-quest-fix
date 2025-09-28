@@ -79,35 +79,62 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   useEffect(() => {
     // Set up auth state listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
+      (event, session) => {
+        console.log('Auth state change:', event, session?.user?.email);
+        
         setSession(session);
         setUser(session?.user ?? null);
         
         if (session?.user) {
+          // Handle different auth events
+          if (event === 'SIGNED_IN') {
+            toast({
+              title: "Signed In",
+              description: "Welcome back!",
+            });
+          } else if (event === 'TOKEN_REFRESHED') {
+            console.log('Token refreshed successfully');
+          }
+          
           // Defer profile fetching to avoid potential RLS issues
           setTimeout(async () => {
-            const profileData = await fetchProfile(session.user.id);
-            setProfile(profileData);
+            try {
+              const profileData = await fetchProfile(session.user.id);
+              setProfile(profileData);
+            } catch (error) {
+              console.error('Error fetching profile after auth change:', error);
+            }
             setLoading(false);
-          }, 0);
+          }, 100);
         } else {
           setProfile(null);
           setLoading(false);
+          
+          if (event === 'SIGNED_OUT') {
+            // Clear any cached data
+            console.log('User signed out, clearing data');
+          }
         }
       }
     );
 
     // Check for existing session
     supabase.auth.getSession().then(({ data: { session } }) => {
+      console.log('Initial session check:', session?.user?.email);
+      
       setSession(session);
       setUser(session?.user ?? null);
       
       if (session?.user) {
         setTimeout(async () => {
-          const profileData = await fetchProfile(session.user.id);
-          setProfile(profileData);
+          try {
+            const profileData = await fetchProfile(session.user.id);
+            setProfile(profileData);
+          } catch (error) {
+            console.error('Error fetching profile on init:', error);
+          }
           setLoading(false);
-        }, 0);
+        }, 100);
       } else {
         setLoading(false);
       }
@@ -125,9 +152,9 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     department?: string
   ) => {
     try {
-      const redirectUrl = `${window.location.origin}/`;
+      const redirectUrl = `${window.location.origin}/auth?verified=true`;
       
-      const { error } = await supabase.auth.signUp({
+      const { data, error } = await supabase.auth.signUp({
         email,
         password,
         options: {
@@ -142,50 +169,94 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       });
 
       if (error) {
+        let errorMessage = error.message;
+        
+        // Provide more specific error messages
+        if (error.message.includes('already registered')) {
+          errorMessage = 'An account with this email already exists. Please sign in instead.';
+        } else if (error.message.includes('Invalid email')) {
+          errorMessage = 'Please enter a valid email address.';
+        } else if (error.message.includes('Password')) {
+          errorMessage = 'Password must be at least 6 characters long.';
+        }
+        
         toast({
           title: "Registration Failed",
-          description: error.message,
+          description: errorMessage,
           variant: "destructive",
         });
         return { error };
       }
 
-      toast({
-        title: "Registration Successful",
-        description: "Please check your email to verify your account.",
-      });
+      // Check if email confirmation is required
+      if (data.user && !data.session) {
+        toast({
+          title: "Check Your Email",
+          description: "We sent you a verification link. Please check your email and click the link to activate your account.",
+        });
+      } else if (data.session) {
+        toast({
+          title: "Registration Successful",
+          description: "Your account has been created successfully!",
+        });
+      }
 
       return { error: null };
     } catch (error) {
       console.error('Sign up error:', error);
+      toast({
+        title: "Registration Failed",
+        description: "An unexpected error occurred. Please try again.",
+        variant: "destructive",
+      });
       return { error };
     }
   };
 
   const signIn = async (email: string, password: string) => {
     try {
-      const { error } = await supabase.auth.signInWithPassword({
+      const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
 
       if (error) {
+        let errorMessage = error.message;
+        
+        // Provide more specific error messages
+        if (error.message.includes('Invalid login credentials')) {
+          errorMessage = 'Invalid email or password. Please check your credentials and try again.';
+        } else if (error.message.includes('Email not confirmed')) {
+          errorMessage = 'Please check your email and click the verification link before signing in.';
+        } else if (error.message.includes('not authorized')) {
+          errorMessage = 'Your account is not authorized. Please contact support.';
+        }
+        
         toast({
           title: "Login Failed",
-          description: error.message,
+          description: errorMessage,
           variant: "destructive",
         });
         return { error };
       }
 
-      toast({
-        title: "Welcome Back!",
-        description: "You have successfully logged in.",
-      });
+      if (data.user) {
+        toast({
+          title: "Welcome Back!",
+          description: "You have successfully logged in.",
+        });
+        
+        // Redirect will be handled by the useEffect in App component based on user profile
+      }
 
       return { error: null };
     } catch (error) {
       console.error('Sign in error:', error);
+      toast({
+        title: "Login Failed",
+        description: "An unexpected error occurred. Please try again.",
+        variant: "destructive",
+      });
       return { error };
     }
   };

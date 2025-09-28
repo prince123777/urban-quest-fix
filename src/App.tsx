@@ -15,9 +15,9 @@ import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
 
-// Protected Route Component
+// Protected Route Component with Smart Redirection
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
-  const { user, loading } = useAuth();
+  const { user, profile, loading } = useAuth();
   
   if (loading) {
     return (
@@ -34,6 +34,30 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   return <>{children}</>;
 };
 
+// Dashboard Router Component
+const DashboardRouter = () => {
+  const { profile, loading } = useAuth();
+  
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
+  
+  if (!profile) {
+    return <Navigate to="/auth" replace />;
+  }
+  
+  // Redirect based on user type
+  if (profile.user_type === 'government') {
+    return <Navigate to="/government-dashboard" replace />;
+  } else {
+    return <Navigate to="/citizen-dashboard" replace />;
+  }
+};
+
 const AppRoutes = () => (
   <BrowserRouter>
     <Routes>
@@ -42,17 +66,26 @@ const AppRoutes = () => (
       <Route path="/login" element={<Navigate to="/auth" replace />} />
       <Route path="/register" element={<Navigate to="/auth" replace />} />
       
-      {/* Protected Routes */}
+      {/* Smart Dashboard Route - redirects based on user type */}
       <Route path="/dashboard" element={
         <ProtectedRoute>
-          <Dashboard />
+          <DashboardRouter />
         </ProtectedRoute>
       } />
+      
+      {/* Specific Dashboard Routes */}
       <Route path="/citizen-dashboard" element={
         <ProtectedRoute>
           <CitizenDashboard />
         </ProtectedRoute>
       } />
+      <Route path="/government-dashboard" element={
+        <ProtectedRoute>
+          <GovernmentDashboard />
+        </ProtectedRoute>
+      } />
+      
+      {/* Other Protected Routes */}
       <Route path="/report" element={
         <ProtectedRoute>
           <ReportIssuePage />
@@ -61,11 +94,6 @@ const AppRoutes = () => (
       <Route path="/map" element={
         <ProtectedRoute>
           <MapView />
-        </ProtectedRoute>
-      } />
-      <Route path="/government-dashboard" element={
-        <ProtectedRoute>
-          <GovernmentDashboard />
         </ProtectedRoute>
       } />
       

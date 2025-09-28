@@ -32,12 +32,31 @@ const AuthPage = () => {
   const [governmentId, setGovernmentId] = useState('');
   const [department, setDepartment] = useState('');
 
-  // Set initial tab based on URL params or default to register
+  // Set initial tab based on URL params
   useEffect(() => {
     const type = searchParams.get('type');
+    const tab = searchParams.get('tab');
+    const verified = searchParams.get('verified');
+    
+    // Handle email verification success
+    if (verified === 'true') {
+      toast({
+        title: "Email Verified!",
+        description: "Your email has been verified successfully. You can now sign in.",
+      });
+      setActiveTab('login');
+      return;
+    }
+    
     if (type === 'citizen' || type === 'government') {
       setUserType(type);
       setActiveTab('register');
+    }
+    
+    if (tab === 'register') {
+      setActiveTab('register');
+    } else if (tab === 'login') {
+      setActiveTab('login');
     }
   }, [searchParams]);
 

@@ -1,7 +1,9 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { useAuth } from "@/contexts/AuthContext";
+import { useEffect } from "react";
 import {
   MapPin,
   Users,
@@ -22,6 +24,19 @@ import {
 } from "lucide-react";
 
 const CivicLanding = () => {
+  const { user, profile, loading } = useAuth();
+  const navigate = useNavigate();
+
+  // Redirect authenticated users to their dashboard
+  useEffect(() => {
+    if (user && profile && !loading) {
+      if (profile.user_type === 'government') {
+        navigate('/government-dashboard');
+      } else {
+        navigate('/citizen-dashboard');
+      }
+    }
+  }, [user, profile, loading, navigate]);
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
@@ -34,16 +49,29 @@ const CivicLanding = () => {
             <span className="text-xl font-bold text-foreground">Civic Connect</span>
           </div>
           <div className="flex items-center space-x-4">
-            <Link to="/login">
-              <Button variant="ghost" className="text-foreground hover:text-primary">
-                Sign In
+            {loading ? (
+              <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary"></div>
+            ) : user ? (
+              <Button 
+                onClick={() => navigate('/dashboard')}
+                className="bg-gradient-primary hover:bg-primary-hover text-white"
+              >
+                Go to Dashboard
               </Button>
-            </Link>
-            <Link to="/register">
-              <Button className="bg-gradient-primary hover:bg-primary-hover text-white">
-                Get Started
-              </Button>
-            </Link>
+            ) : (
+              <>
+                <Link to="/auth">
+                  <Button variant="ghost" className="text-foreground hover:text-primary">
+                    Sign In
+                  </Button>
+                </Link>
+                <Link to="/auth?tab=register">
+                  <Button className="bg-gradient-primary hover:bg-primary-hover text-white">
+                    Get Started
+                  </Button>
+                </Link>
+              </>
+            )}
           </div>
         </div>
       </header>

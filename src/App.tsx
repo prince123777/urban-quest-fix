@@ -12,6 +12,7 @@ import ReportIssuePage from "./pages/ReportIssuePage";
 import GovernmentDashboard from "./pages/GovernmentDashboard";
 import MapView from "./pages/MapView";
 import NotFound from "./pages/NotFound";
+import DashboardRedirect from "./components/DashboardRedirect";
 
 const queryClient = new QueryClient();
 

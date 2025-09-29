@@ -11,6 +11,7 @@ import { Badge } from '@/components/ui/badge';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
+import BackButton from '@/components/BackButton';
 import {
   MapPin,
   Camera,
@@ -322,10 +323,7 @@ const ReportIssuePage = () => {
       <header className="border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50">
         <div className="container mx-auto px-4 py-4 flex justify-between items-center">
           <div className="flex items-center space-x-4">
-            <Link to="/citizen-dashboard" className="flex items-center space-x-2 text-muted-foreground hover:text-primary transition-colors">
-              <ArrowLeft className="w-4 h-4" />
-              <span>Back to Dashboard</span>
-            </Link>
+            <BackButton />
           </div>
           <div className="flex items-center space-x-2">
             <Badge variant="outline">Step {['details', 'location', 'media', 'review'].indexOf(step) + 1} of 4</Badge>

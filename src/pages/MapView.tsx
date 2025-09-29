@@ -7,6 +7,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import Navigation from '@/components/Navigation';
+import BackButton from '@/components/BackButton';
 import { Loader } from '@googlemaps/js-api-loader';
 import {
   MapPin,
@@ -339,10 +340,17 @@ const MapView = () => {
       <div className="container mx-auto p-6">
         {/* Header */}
         <div className="mb-6">
-          <h1 className="text-3xl font-bold text-foreground mb-2">Issue Map</h1>
-          <p className="text-muted-foreground">
-            View all reported civic issues on an interactive map
-          </p>
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center space-x-4">
+              <BackButton />
+              <div>
+                <h1 className="text-3xl font-bold text-foreground">Issue Map</h1>
+                <p className="text-muted-foreground">
+                  View all reported civic issues on an interactive map
+                </p>
+              </div>
+            </div>
+          </div>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">

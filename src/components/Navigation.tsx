@@ -1,16 +1,15 @@
-import { useState } from "react";
-import { Link, useLocation } from "react-router-dom";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { 
-  MapPin, 
-  User, 
-  LogOut, 
-  Menu, 
-  X, 
-  Coins,
-  Bell
-} from "lucide-react";
+import { Link, useLocation } from 'react-router-dom';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import CivicCoinBadge from '@/components/CivicCoinBadge';
+import MobileNavbar from '@/components/MobileNavbar';
+import { useAuth } from '@/contexts/AuthContext';
+import {
+  MapPin,
+  Bell,
+  User,
+  LogOut,
+} from 'lucide-react';
 
 interface NavigationProps {
   userType?: "citizen" | "government" | null;
@@ -25,57 +24,67 @@ const Navigation = ({
   notifications = 0, 
   onLogout 
 }: NavigationProps) => {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const location = useLocation();
+  const { user, profile, signOut } = useAuth();
 
   const isActive = (path: string) => location.pathname === path;
 
-  const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
+  const handleLogout = async () => {
+    try {
+      await signOut();
+      if (onLogout) onLogout();
+    } catch (error) {
+      console.error('Logout error:', error);
+    }
+  };
+
+  // Use auth context data if available, otherwise fall back to props
+  const currentUserType = profile?.user_type || userType;
+  const currentCivicCoins = profile?.civic_coins || civicCoins;
 
   return (
     <nav className="bg-background border-b border-border shadow-soft sticky top-0 z-50">
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
-          {/* Logo */}
-          <Link 
-            to="/" 
-            className="flex items-center space-x-2 transition-smooth hover:opacity-80"
-          >
-            <div className="bg-gradient-primary w-10 h-10 rounded-lg flex items-center justify-center">
-              <MapPin className="w-6 h-6 text-primary-foreground" />
-            </div>
-            <div>
-              <h1 className="text-xl font-bold text-foreground">Civic Coin</h1>
-              <p className="text-xs text-muted-foreground">Building Better Cities</p>
-            </div>
-          </Link>
+          {/* Mobile Hamburger Menu */}
+          <div className="flex items-center space-x-4">
+            <MobileNavbar 
+              userType={currentUserType}
+              civicCoins={currentCivicCoins}
+              notifications={notifications}
+              onLogout={handleLogout}
+            />
+            
+            {/* Logo */}
+            <Link 
+              to="/" 
+              className="flex items-center space-x-2 transition-smooth hover:opacity-80"
+            >
+              <div className="bg-gradient-primary w-10 h-10 rounded-lg flex items-center justify-center">
+                <MapPin className="w-6 h-6 text-primary-foreground" />
+              </div>
+              <div className="hidden sm:block">
+                <h1 className="text-xl font-bold text-foreground">Civic.io</h1>
+                <p className="text-xs text-muted-foreground">Building Better Cities</p>
+              </div>
+            </Link>
+          </div>
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-6">
-            {userType && (
+            {user && profile && (
               <>
                 <Link
-                  to="/dashboard"
+                  to={profile.user_type === 'citizen' ? '/citizen-dashboard' : '/government-dashboard'}
                   className={`px-3 py-2 rounded-md text-sm font-medium transition-smooth ${
-                    isActive("/dashboard")
+                    isActive("/citizen-dashboard") || isActive("/government-dashboard") || isActive("/dashboard")
                       ? "bg-primary text-primary-foreground"
                       : "text-muted-foreground hover:text-foreground hover:bg-muted"
                   }`}
                 >
                   Dashboard
                 </Link>
-                {userType === "citizen" && (
-                  <Link
-                    to="/report"
-                    className={`px-3 py-2 rounded-md text-sm font-medium transition-smooth ${
-                      isActive("/report")
-                        ? "bg-primary text-primary-foreground"
-                        : "text-muted-foreground hover:text-foreground hover:bg-muted"
-                    }`}
-                  >
-                    Report Issue
-                  </Link>
-                )}
+                
                 <Link
                   to="/map"
                   className={`px-3 py-2 rounded-md text-sm font-medium transition-smooth ${
@@ -84,21 +93,46 @@ const Navigation = ({
                       : "text-muted-foreground hover:text-foreground hover:bg-muted"
                   }`}
                 >
-                  City Map
+                  Map
                 </Link>
+
+                {profile.user_type === "citizen" && (
+                  <>
+                    <Link
+                      to="/report"
+                      className={`px-3 py-2 rounded-md text-sm font-medium transition-smooth ${
+                        isActive("/report")
+                          ? "bg-primary text-primary-foreground"
+                          : "text-muted-foreground hover:text-foreground hover:bg-muted"
+                      }`}
+                    >
+                      Report
+                    </Link>
+                    <Link
+                      to="/leaderboard"
+                      className={`px-3 py-2 rounded-md text-sm font-medium transition-smooth ${
+                        isActive("/leaderboard")
+                          ? "bg-primary text-primary-foreground"
+                          : "text-muted-foreground hover:text-foreground hover:bg-muted"
+                      }`}
+                    >
+                      Leaderboard
+                    </Link>
+                  </>
+                )}
               </>
             )}
 
             {/* User Actions */}
-            {userType ? (
+            {user && profile ? (
               <div className="flex items-center space-x-4">
                 {/* Civic Coins */}
-                <div className="flex items-center space-x-1 bg-gradient-gold px-3 py-1 rounded-full">
-                  <Coins className="w-4 h-4 text-accent-foreground" />
-                  <span className="text-sm font-semibold text-accent-foreground">
-                    {civicCoins.toLocaleString()}
-                  </span>
-                </div>
+                <CivicCoinBadge 
+                  coins={profile.civic_coins} 
+                  rank={profile.rank as "bronze" | "silver" | "gold" | "platinum"} 
+                  showRank={false}
+                  size="sm" 
+                />
 
                 {/* Notifications */}
                 {notifications > 0 && (
@@ -115,122 +149,59 @@ const Navigation = ({
                   </div>
                 )}
 
-                {/* Profile Menu */}
+                {/* Profile Actions */}
                 <div className="flex items-center space-x-2">
                   <Button variant="ghost" size="sm">
                     <User className="w-5 h-5" />
                   </Button>
-                  <Button variant="ghost" size="sm" onClick={onLogout}>
+                  <Button variant="ghost" size="sm" onClick={handleLogout}>
                     <LogOut className="w-5 h-5" />
                   </Button>
                 </div>
               </div>
             ) : (
               <div className="flex items-center space-x-3">
-                <Link to="/login">
+                <Link to="/auth">
                   <Button variant="ghost">Sign In</Button>
                 </Link>
-                <Link to="/register">
-                  <Button variant="civic">Get Started</Button>
+                <Link to="/auth">
+                  <Button className="bg-gradient-primary hover:bg-primary-hover text-white">
+                    Get Started
+                  </Button>
                 </Link>
               </div>
             )}
           </div>
 
-          {/* Mobile menu button */}
-          <div className="md:hidden">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={toggleMenu}
-            >
-              {isMenuOpen ? (
-                <X className="w-6 h-6" />
-              ) : (
-                <Menu className="w-6 h-6" />
-              )}
-            </Button>
+          {/* Mobile User Info */}
+          <div className="md:hidden flex items-center space-x-2">
+            {user && profile && (
+              <>
+                {notifications > 0 && (
+                  <div className="relative">
+                    <Bell className="w-5 h-5 text-muted-foreground" />
+                    <Badge 
+                      variant="destructive" 
+                      className="absolute -top-2 -right-2 px-1 min-w-[1.25rem] h-5 text-xs"
+                    >
+                      {notifications > 9 ? "9+" : notifications}
+                    </Badge>
+                  </div>
+                )}
+                <div className="w-8 h-8 bg-gradient-primary rounded-full flex items-center justify-center">
+                  <User className="w-4 h-4 text-white" />
+                </div>
+              </>
+            )}
+            {!user && (
+              <Link to="/auth">
+                <Button size="sm" className="bg-gradient-primary hover:bg-primary-hover text-white">
+                  Sign In
+                </Button>
+              </Link>
+            )}
           </div>
         </div>
-
-        {/* Mobile Navigation Menu */}
-        {isMenuOpen && (
-          <div className="md:hidden border-t border-border bg-background">
-            <div className="px-2 pt-2 pb-3 space-y-1">
-              {userType ? (
-                <>
-                  <Link
-                    to="/dashboard"
-                    className={`block px-3 py-2 rounded-md text-base font-medium transition-smooth ${
-                      isActive("/dashboard")
-                        ? "bg-primary text-primary-foreground"
-                        : "text-muted-foreground hover:text-foreground hover:bg-muted"
-                    }`}
-                    onClick={() => setIsMenuOpen(false)}
-                  >
-                    Dashboard
-                  </Link>
-                  {userType === "citizen" && (
-                    <Link
-                      to="/report"
-                      className={`block px-3 py-2 rounded-md text-base font-medium transition-smooth ${
-                        isActive("/report")
-                          ? "bg-primary text-primary-foreground"
-                          : "text-muted-foreground hover:text-foreground hover:bg-muted"
-                      }`}
-                      onClick={() => setIsMenuOpen(false)}
-                    >
-                      Report Issue
-                    </Link>
-                  )}
-                  <Link
-                    to="/map"
-                    className={`block px-3 py-2 rounded-md text-base font-medium transition-smooth ${
-                      isActive("/map")
-                        ? "bg-primary text-primary-foreground"
-                        : "text-muted-foreground hover:text-foreground hover:bg-muted"
-                    }`}
-                    onClick={() => setIsMenuOpen(false)}
-                  >
-                    City Map
-                  </Link>
-
-                  {/* Mobile Civic Coins */}
-                  <div className="flex items-center justify-center space-x-1 bg-gradient-gold mx-3 my-2 px-3 py-2 rounded-full">
-                    <Coins className="w-4 h-4 text-accent-foreground" />
-                    <span className="text-sm font-semibold text-accent-foreground">
-                      {civicCoins.toLocaleString()} Civic Coins
-                    </span>
-                  </div>
-
-                  <div className="border-t border-border pt-4 mt-4">
-                    <Button 
-                      variant="ghost" 
-                      className="w-full justify-start" 
-                      onClick={onLogout}
-                    >
-                      <LogOut className="w-5 h-5 mr-2" />
-                      Sign Out
-                    </Button>
-                  </div>
-                </>
-              ) : (
-                <div className="space-y-2">
-                  <Link to="/login" onClick={() => setIsMenuOpen(false)}>
-                    <Button variant="ghost" className="w-full">
-                      Sign In
-                    </Button>
-                  </Link>
-                  <Link to="/register" onClick={() => setIsMenuOpen(false)}>
-                    <Button variant="civic" className="w-full">
-                      Get Started
-                    </Button>
-                  </Link>
-                </div>
-              )}
-            </div>
-          </div>
-        )}
       </div>
     </nav>
   );

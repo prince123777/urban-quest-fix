@@ -10,6 +10,9 @@ import Dashboard from "./pages/Dashboard";
 import CitizenDashboard from "./pages/CitizenDashboard";
 import ReportIssuePage from "./pages/ReportIssuePage";
 import GovernmentDashboard from "./pages/GovernmentDashboard";
+import LeaderboardPage from "./pages/LeaderboardPage";
+import ProfilePage from "./pages/ProfilePage";
+import SettingsPage from "./pages/SettingsPage";
 import MapView from "./pages/MapView";
 import NotFound from "./pages/NotFound";
 import DashboardRedirect from "./components/DashboardRedirect";
@@ -92,11 +95,22 @@ const AppRoutes = () => (
           <ReportIssuePage />
         </ProtectedRoute>
       } />
-      <Route path="/map" element={
+      <Route path="/leaderboard" element={
         <ProtectedRoute>
-          <MapView />
+          <LeaderboardPage />
         </ProtectedRoute>
       } />
+      <Route path="/profile" element={
+        <ProtectedRoute>
+          <ProfilePage />
+        </ProtectedRoute>
+      } />
+      <Route path="/settings" element={
+        <ProtectedRoute>
+          <SettingsPage />
+        </ProtectedRoute>
+      } />
+      <Route path="/map" element={<MapView />} />
       
       {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
       <Route path="*" element={<NotFound />} />
